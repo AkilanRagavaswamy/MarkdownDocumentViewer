@@ -1,4 +1,4 @@
-| Close find, Settings or focus mode | Esc |# Markdown Viewer - Simple
+# Markdown Viewer - Simple
 
 A fast, private, read-only Markdown viewer for Windows 10 and 11, built with WinUI 3 (Windows App SDK 1.6) and .NET 8.
 
