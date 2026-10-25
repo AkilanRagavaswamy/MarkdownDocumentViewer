@@ -9,9 +9,8 @@
   IgnorableNamespaces="uap uap3 uap5 desktop rescap">
 
   <!--
-    Identity Name and Publisher are placeholders. When you associate the project with the
-    reserved app name in Partner Center (Project > Package and Publish > Associate App with the Store),
-    Visual Studio replaces Name, Publisher and PublisherDisplayName with the values from your account.
+    Identity and PublisherDisplayName come from Partner Center and must match the reserved app
+    exactly, or the Store rejects the upload. Keep the fourth part of Version at 0.
   -->
   <Identity
     Name="AkilanRagavaswamy.MarkdownViewer-Simple"
@@ -20,7 +19,7 @@
 
   <Properties>
     <DisplayName>Markdown Viewer - Simple</DisplayName>
-    <PublisherDisplayName>[Your publisher name]</PublisherDisplayName>
+    <PublisherDisplayName>Akilan Ragavaswamy</PublisherDisplayName>
     <Logo>Assets\StoreLogo.png</Logo>
   </Properties>
 
