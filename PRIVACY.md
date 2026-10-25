@@ -56,4 +56,4 @@ If this policy changes, the updated version will be published at this address wi
 
 ## Contact
 
-Questions about this policy: **\<add a contact email or an issue-tracker link before publishing\>**
+Questions about this policy: **[Raise as an issue here](https://github.com/AkilanRagavaswamy/MarkdownDocumentViewer/issues)**
