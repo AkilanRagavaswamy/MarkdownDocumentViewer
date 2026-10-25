@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Package
   xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
   xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
@@ -14,8 +14,8 @@
     Visual Studio replaces Name, Publisher and PublisherDisplayName with the values from your account.
   -->
   <Identity
-    Name="MarkdownViewerSimple"
-    Publisher="CN=YourPublisher"
+    Name="AkilanRagavaswamy.MarkdownViewer-Simple"
+    Publisher="CN=4FEF7FAB-6AD4-4C46-88A8-05AFF705DD4C"
     Version="1.0.0.0" />
 
   <Properties>
