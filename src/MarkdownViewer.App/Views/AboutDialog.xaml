@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ContentDialog
+    x:Class="MarkdownViewer.App.Views.AboutDialog"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:views="using:MarkdownViewer.App.Views"
+    mc:Ignorable="d"
+    Title="About"
+    CloseButtonText="Close"
+    DefaultButton="Close"
+    Style="{StaticResource DefaultContentDialogStyle}">
+
+    <ContentDialog.Resources>
+        <x:Double x:Key="ContentDialogMaxWidth">460</x:Double>
+    </ContentDialog.Resources>
+
+    <StackPanel Spacing="16">
+        <StackPanel Orientation="Horizontal" Spacing="16">
+            <Image
+                Width="48"
+                Height="48"
+                VerticalAlignment="Top"
+                AutomationProperties.AccessibilityView="Raw"
+                Source="ms-appx:///Assets/Square44x44Logo.png" />
+            <StackPanel VerticalAlignment="Center" Spacing="2">
+                <TextBlock
+                    AutomationProperties.HeadingLevel="Level1"
+                    Style="{StaticResource SubtitleTextBlockStyle}"
+                    Text="Markdown Viewer - Simple" />
+                <TextBlock
+                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                    IsTextSelectionEnabled="True"
+                    Style="{StaticResource CaptionTextBlockStyle}"
+                    Text="{x:Bind views:AboutDialog.VersionText}" />
+            </StackPanel>
+        </StackPanel>
+
+        <TextBlock
+            Style="{StaticResource BodyTextBlockStyle}"
+            Text="A fast, private, offline Markdown reader with tabs, outline, find and multi-column reading."
+            TextWrapping="WrapWholeWords" />
+
+        <TextBlock
+            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+            Style="{StaticResource CaptionTextBlockStyle}"
+            Text="Works offline. Documents never leave your PC."
+            TextWrapping="WrapWholeWords" />
+    </StackPanel>
+</ContentDialog>

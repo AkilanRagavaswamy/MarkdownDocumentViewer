@@ -1,0 +1,271 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ContentDialog
+    x:Class="MarkdownViewer.App.Views.ShortcutsDialog"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:views="using:MarkdownViewer.App.Views"
+    xmlns:vm="using:MarkdownViewer.Core.ViewModels"
+    xmlns:contracts="using:MarkdownViewer.Core.Contracts"
+    mc:Ignorable="d"
+    Title="Keyboard shortcuts"
+    CloseButtonText="Close"
+    DefaultButton="Close"
+    Style="{StaticResource DefaultContentDialogStyle}">
+
+    <ContentDialog.Resources>
+        <x:Double x:Key="ContentDialogMaxWidth">840</x:Double>
+        <x:Double x:Key="ContentDialogMaxHeight">800</x:Double>
+
+        <!-- Category tab: text with an accent underline when selected. -->
+        <Style x:Key="CategoryTabItemStyle" TargetType="ListViewItem">
+            <Setter Property="Padding" Value="12,0" />
+            <Setter Property="Margin" Value="0" />
+            <Setter Property="MinWidth" Value="0" />
+            <Setter Property="MinHeight" Value="36" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Foreground" Value="{ThemeResource TextFillColorSecondaryBrush}" />
+            <Setter Property="UseSystemFocusVisuals" Value="True" />
+            <Setter Property="FocusVisualMargin" Value="0" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ListViewItem">
+                        <Grid
+                            x:Name="Root"
+                            MinHeight="{TemplateBinding MinHeight}"
+                            Padding="{TemplateBinding Padding}"
+                            Background="{TemplateBinding Background}"
+                            CornerRadius="{StaticResource ControlCornerRadius}">
+                            <VisualStateManager.VisualStateGroups>
+                                <VisualStateGroup x:Name="CommonStates">
+                                    <VisualState x:Name="Normal" />
+                                    <VisualState x:Name="PointerOver">
+                                        <VisualState.Setters>
+                                            <Setter Target="Root.Background" Value="{ThemeResource SubtleFillColorSecondaryBrush}" />
+                                            <Setter Target="Presenter.Foreground" Value="{ThemeResource TextFillColorPrimaryBrush}" />
+                                        </VisualState.Setters>
+                                    </VisualState>
+                                    <VisualState x:Name="Pressed">
+                                        <VisualState.Setters>
+                                            <Setter Target="Root.Background" Value="{ThemeResource SubtleFillColorTertiaryBrush}" />
+                                            <Setter Target="Presenter.Foreground" Value="{ThemeResource TextFillColorSecondaryBrush}" />
+                                        </VisualState.Setters>
+                                    </VisualState>
+                                    <VisualState x:Name="Selected">
+                                        <VisualState.Setters>
+                                            <Setter Target="Indicator.Opacity" Value="1" />
+                                            <Setter Target="Presenter.Foreground" Value="{ThemeResource TextFillColorPrimaryBrush}" />
+                                            <Setter Target="Presenter.FontWeight" Value="SemiBold" />
+                                        </VisualState.Setters>
+                                    </VisualState>
+                                    <VisualState x:Name="PointerOverSelected">
+                                        <VisualState.Setters>
+                                            <Setter Target="Root.Background" Value="{ThemeResource SubtleFillColorSecondaryBrush}" />
+                                            <Setter Target="Indicator.Opacity" Value="1" />
+                                            <Setter Target="Presenter.Foreground" Value="{ThemeResource TextFillColorPrimaryBrush}" />
+                                            <Setter Target="Presenter.FontWeight" Value="SemiBold" />
+                                        </VisualState.Setters>
+                                    </VisualState>
+                                    <VisualState x:Name="PressedSelected">
+                                        <VisualState.Setters>
+                                            <Setter Target="Root.Background" Value="{ThemeResource SubtleFillColorTertiaryBrush}" />
+                                            <Setter Target="Indicator.Opacity" Value="1" />
+                                            <Setter Target="Presenter.Foreground" Value="{ThemeResource TextFillColorPrimaryBrush}" />
+                                            <Setter Target="Presenter.FontWeight" Value="SemiBold" />
+                                        </VisualState.Setters>
+                                    </VisualState>
+                                </VisualStateGroup>
+                            </VisualStateManager.VisualStateGroups>
+
+                            <ContentPresenter
+                                x:Name="Presenter"
+                                VerticalAlignment="Center"
+                                Content="{TemplateBinding Content}"
+                                ContentTemplate="{TemplateBinding ContentTemplate}"
+                                Foreground="{TemplateBinding Foreground}" />
+                            <Rectangle
+                                x:Name="Indicator"
+                                Height="3"
+                                RadiusX="1.5"
+                                RadiusY="1.5"
+                                VerticalAlignment="Bottom"
+                                Fill="{ThemeResource AccentFillColorDefaultBrush}"
+                                Opacity="0" />
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </ContentDialog.Resources>
+
+    <Grid Width="776" RowSpacing="12">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <!-- Search + count -->
+        <Grid ColumnSpacing="16">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <AutoSuggestBox
+                PlaceholderText="Search shortcuts, e.g. zoom or Ctrl+F"
+                QueryIcon="Find"
+                AutomationProperties.Name="Search shortcuts"
+                Text="{x:Bind ViewModel.SearchText, Mode=TwoWay}" />
+            <TextBlock
+                Grid.Column="1"
+                VerticalAlignment="Center"
+                Style="{StaticResource CaptionTextBlockStyle}"
+                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                AutomationProperties.LiveSetting="Polite"
+                Text="{x:Bind views:ShortcutsDialog.CountText(ViewModel.Count), Mode=OneWay}" />
+        </Grid>
+
+        <!-- Category tabs -->
+        <Border Grid.Row="1" BorderBrush="{ThemeResource DividerStrokeColorDefaultBrush}" BorderThickness="0,0,0,1">
+            <ListView
+                SelectionMode="Single"
+                IsItemClickEnabled="False"
+                ItemsSource="{x:Bind ViewModel.Categories, Mode=OneWay}"
+                SelectedItem="{x:Bind ViewModel.SelectedCategory, Mode=TwoWay}"
+                ItemContainerStyle="{StaticResource CategoryTabItemStyle}"
+                ScrollViewer.HorizontalScrollMode="Enabled"
+                ScrollViewer.HorizontalScrollBarVisibility="Hidden"
+                ScrollViewer.VerticalScrollMode="Disabled"
+                ScrollViewer.VerticalScrollBarVisibility="Disabled"
+                AutomationProperties.Name="Shortcut categories">
+                <ListView.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel Orientation="Horizontal" Spacing="4" />
+                    </ItemsPanelTemplate>
+                </ListView.ItemsPanel>
+                <ListView.ItemTemplate>
+                    <DataTemplate x:DataType="x:String">
+                        <TextBlock Text="{x:Bind}" />
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+        </Border>
+
+        <!-- Groups -->
+        <Grid Grid.Row="2" Height="440">
+            <ScrollViewer
+                HorizontalScrollMode="Disabled"
+                HorizontalScrollBarVisibility="Disabled"
+                VerticalScrollBarVisibility="Auto"
+                Padding="0,0,12,0">
+                <ItemsRepeater ItemsSource="{x:Bind ViewModel.Groups, Mode=OneWay}">
+                    <ItemsRepeater.Layout>
+                        <StackLayout Orientation="Vertical" Spacing="16" />
+                    </ItemsRepeater.Layout>
+                    <ItemsRepeater.ItemTemplate>
+                        <DataTemplate x:DataType="vm:ShortcutGroupViewModel">
+                            <StackPanel>
+                                <TextBlock
+                                    Margin="0,8,0,4"
+                                    Text="{x:Bind Title}"
+                                    FontSize="12"
+                                    FontWeight="SemiBold"
+                                    CharacterSpacing="20"
+                                    Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"
+                                    AutomationProperties.HeadingLevel="Level2" />
+                                <!-- Rows are uniform height, so a uniform grid gives two even columns. -->
+                                <ItemsRepeater ItemsSource="{x:Bind Items}">
+                                    <ItemsRepeater.Layout>
+                                        <UniformGridLayout
+                                            MinItemWidth="340"
+                                            MinItemHeight="32"
+                                            MinColumnSpacing="32"
+                                            MinRowSpacing="0"
+                                            MaximumRowsOrColumns="2"
+                                            ItemsStretch="Fill" />
+                                    </ItemsRepeater.Layout>
+                                    <ItemsRepeater.ItemTemplate>
+                                        <DataTemplate x:DataType="vm:ShortcutItemViewModel">
+                                            <Grid
+                                                MinHeight="32"
+                                                ColumnSpacing="12"
+                                                BorderBrush="{ThemeResource DividerStrokeColorDefaultBrush}"
+                                                BorderThickness="0,0,0,1">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="Auto" />
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock
+                                                    VerticalAlignment="Center"
+                                                    FontSize="13"
+                                                    Text="{x:Bind Label}"
+                                                    TextTrimming="CharacterEllipsis"
+                                                    AutomationProperties.Name="{x:Bind AutomationName}" />
+                                                <ItemsRepeater
+                                                    Grid.Column="1"
+                                                    VerticalAlignment="Center"
+                                                    ItemsSource="{x:Bind Parts}"
+                                                    AutomationProperties.AccessibilityView="Raw">
+                                                    <ItemsRepeater.Layout>
+                                                        <StackLayout Orientation="Horizontal" Spacing="4" />
+                                                    </ItemsRepeater.Layout>
+                                                    <ItemsRepeater.ItemTemplate>
+                                                        <DataTemplate x:DataType="contracts:KeyPart">
+                                                            <Grid VerticalAlignment="Center">
+                                                                <!-- Key cap: 1px stroke with a 2px bottom edge. -->
+                                                                <Border
+                                                                    MinWidth="24"
+                                                                    Height="22"
+                                                                    Padding="6,2"
+                                                                    CornerRadius="4"
+                                                                    BorderThickness="1,1,1,2"
+                                                                    Background="{ThemeResource ControlFillColorDefaultBrush}"
+                                                                    BorderBrush="{ThemeResource ControlStrokeColorDefaultBrush}"
+                                                                    Visibility="{x:Bind IsKey}">
+                                                                    <TextBlock
+                                                                        HorizontalAlignment="Center"
+                                                                        VerticalAlignment="Center"
+                                                                        FontSize="12"
+                                                                        Text="{x:Bind Text}" />
+                                                                </Border>
+                                                                <TextBlock
+                                                                    VerticalAlignment="Center"
+                                                                    FontSize="11.5"
+                                                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                                    Text="{x:Bind Text}"
+                                                                    Visibility="{x:Bind views:ShortcutsDialog.NotVisible(IsKey)}" />
+                                                            </Grid>
+                                                        </DataTemplate>
+                                                    </ItemsRepeater.ItemTemplate>
+                                                </ItemsRepeater>
+                                            </Grid>
+                                        </DataTemplate>
+                                    </ItemsRepeater.ItemTemplate>
+                                </ItemsRepeater>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ItemsRepeater.ItemTemplate>
+                </ItemsRepeater>
+            </ScrollViewer>
+
+            <!-- Empty state -->
+            <TextBlock
+                Margin="0,40,0,0"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Top"
+                TextWrapping="Wrap"
+                TextAlignment="Center"
+                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                Text="{x:Bind views:ShortcutsDialog.EmptyText(ViewModel.SearchText), Mode=OneWay}"
+                Visibility="{x:Bind ViewModel.IsEmpty, Mode=OneWay}" />
+        </Grid>
+
+        <TextBlock
+            Grid.Row="3"
+            Style="{StaticResource CaptionTextBlockStyle}"
+            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+            Text="Open this list any time with Ctrl+/ or F1. Shortcuts follow Windows conventions." />
+    </Grid>
+</ContentDialog>

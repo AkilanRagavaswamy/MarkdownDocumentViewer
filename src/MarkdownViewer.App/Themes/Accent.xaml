@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Accent brushes for Markdown Viewer - Simple.
+  These SolidColorBrush instances are overridden at app scope (merged after XamlControlsResources).
+  ThemeService mutates their Color at runtime from IAccentService shades, so every control using them
+  updates in place. Keep the key list in sync with ThemeService.BrushMap.
+  Defaults below are the "Blue" (#546DE5) accent.
+-->
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <ResourceDictionary.ThemeDictionaries>
+        <ResourceDictionary x:Key="Light">
+            <SolidColorBrush x:Key="AccentFillColorDefaultBrush" Color="#FF4E65D5" />
+            <SolidColorBrush x:Key="AccentFillColorSecondaryBrush" Color="#E64E65D5" />
+            <SolidColorBrush x:Key="AccentFillColorTertiaryBrush" Color="#CC4E65D5" />
+            <SolidColorBrush x:Key="AccentFillColorSelectedTextBackgroundBrush" Color="#FF4E65D5" />
+            <SolidColorBrush x:Key="AccentTextFillColorPrimaryBrush" Color="#FF4E65D5" />
+            <SolidColorBrush x:Key="AccentTextFillColorSecondaryBrush" Color="#FF4E65D5" />
+            <SolidColorBrush x:Key="AccentTextFillColorTertiaryBrush" Color="#FF4E65D5" />
+            <SolidColorBrush x:Key="TextOnAccentFillColorPrimaryBrush" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="TextOnAccentFillColorSecondaryBrush" Color="#B2FFFFFF" />
+            <SolidColorBrush x:Key="SystemControlHighlightAccentBrush" Color="#FF4E65D5" />
+            <SolidColorBrush x:Key="SystemControlForegroundAccentBrush" Color="#FF4E65D5" />
+            <SolidColorBrush x:Key="AccentButtonBackground" Color="#FF4E65D5" />
+            <SolidColorBrush x:Key="AccentButtonBackgroundPointerOver" Color="#E64E65D5" />
+            <SolidColorBrush x:Key="AccentButtonBackgroundPressed" Color="#CC4E65D5" />
+            <SolidColorBrush x:Key="AccentButtonForeground" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="AccentButtonForegroundPointerOver" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="AccentButtonForegroundPressed" Color="#B2FFFFFF" />
+            <SolidColorBrush x:Key="ToggleButtonBackgroundChecked" Color="#FF4E65D5" />
+            <SolidColorBrush x:Key="ToggleButtonBackgroundCheckedPointerOver" Color="#E64E65D5" />
+            <SolidColorBrush x:Key="ToggleButtonBackgroundCheckedPressed" Color="#CC4E65D5" />
+            <SolidColorBrush x:Key="ToggleButtonForegroundChecked" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="ToggleButtonForegroundCheckedPointerOver" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="ToggleButtonForegroundCheckedPressed" Color="#B2FFFFFF" />
+            <SolidColorBrush x:Key="AppBarToggleButtonBackgroundChecked" Color="#FFE6E9F7" />
+            <SolidColorBrush x:Key="AppBarToggleButtonBackgroundCheckedPointerOver" Color="#FFE6E9F7" />
+            <SolidColorBrush x:Key="AppBarToggleButtonBackgroundCheckedPressed" Color="#FFE6E9F7" />
+            <SolidColorBrush x:Key="AppBarToggleButtonForegroundChecked" Color="#FF4E65D5" />
+            <SolidColorBrush x:Key="AppBarToggleButtonForegroundCheckedPointerOver" Color="#FF4E65D5" />
+            <SolidColorBrush x:Key="AppBarToggleButtonForegroundCheckedPressed" Color="#FF4E65D5" />
+            <SolidColorBrush x:Key="MdvAccentFillBrush" Color="#FF4E65D5" />
+            <SolidColorBrush x:Key="MdvAccentTextBrush" Color="#FF4E65D5" />
+            <SolidColorBrush x:Key="MdvAccentTintBrush" Color="#FFE6E9F7" />
+            <SolidColorBrush x:Key="MdvAccentMarkBrush" Color="#FFD4DAF8" />
+            <SolidColorBrush x:Key="MdvReadingBackgroundBrush" Color="#FFFFFFFF" />
+        </ResourceDictionary>
+        <ResourceDictionary x:Key="Dark">
+            <SolidColorBrush x:Key="AccentFillColorDefaultBrush" Color="#FF546DE5" />
+            <SolidColorBrush x:Key="AccentFillColorSecondaryBrush" Color="#E6546DE5" />
+            <SolidColorBrush x:Key="AccentFillColorTertiaryBrush" Color="#CC546DE5" />
+            <SolidColorBrush x:Key="AccentFillColorSelectedTextBackgroundBrush" Color="#FF546DE5" />
+            <SolidColorBrush x:Key="AccentTextFillColorPrimaryBrush" Color="#FF6C81E9" />
+            <SolidColorBrush x:Key="AccentTextFillColorSecondaryBrush" Color="#FF6C81E9" />
+            <SolidColorBrush x:Key="AccentTextFillColorTertiaryBrush" Color="#FF546DE5" />
+            <SolidColorBrush x:Key="TextOnAccentFillColorPrimaryBrush" Color="#FF000000" />
+            <SolidColorBrush x:Key="TextOnAccentFillColorSecondaryBrush" Color="#B2000000" />
+            <SolidColorBrush x:Key="SystemControlHighlightAccentBrush" Color="#FF546DE5" />
+            <SolidColorBrush x:Key="SystemControlForegroundAccentBrush" Color="#FF6C81E9" />
+            <SolidColorBrush x:Key="AccentButtonBackground" Color="#FF546DE5" />
+            <SolidColorBrush x:Key="AccentButtonBackgroundPointerOver" Color="#E6546DE5" />
+            <SolidColorBrush x:Key="AccentButtonBackgroundPressed" Color="#CC546DE5" />
+            <SolidColorBrush x:Key="AccentButtonForeground" Color="#FF000000" />
+            <SolidColorBrush x:Key="AccentButtonForegroundPointerOver" Color="#FF000000" />
+            <SolidColorBrush x:Key="AccentButtonForegroundPressed" Color="#B2000000" />
+            <SolidColorBrush x:Key="ToggleButtonBackgroundChecked" Color="#FF546DE5" />
+            <SolidColorBrush x:Key="ToggleButtonBackgroundCheckedPointerOver" Color="#E6546DE5" />
+            <SolidColorBrush x:Key="ToggleButtonBackgroundCheckedPressed" Color="#CC546DE5" />
+            <SolidColorBrush x:Key="ToggleButtonForegroundChecked" Color="#FF000000" />
+            <SolidColorBrush x:Key="ToggleButtonForegroundCheckedPointerOver" Color="#FF000000" />
+            <SolidColorBrush x:Key="ToggleButtonForegroundCheckedPressed" Color="#B2000000" />
+            <SolidColorBrush x:Key="AppBarToggleButtonBackgroundChecked" Color="#FF343A54" />
+            <SolidColorBrush x:Key="AppBarToggleButtonBackgroundCheckedPointerOver" Color="#FF343A54" />
+            <SolidColorBrush x:Key="AppBarToggleButtonBackgroundCheckedPressed" Color="#FF343A54" />
+            <SolidColorBrush x:Key="AppBarToggleButtonForegroundChecked" Color="#FF6C81E9" />
+            <SolidColorBrush x:Key="AppBarToggleButtonForegroundCheckedPointerOver" Color="#FF6C81E9" />
+            <SolidColorBrush x:Key="AppBarToggleButtonForegroundCheckedPressed" Color="#FF6C81E9" />
+            <SolidColorBrush x:Key="MdvAccentFillBrush" Color="#FF546DE5" />
+            <SolidColorBrush x:Key="MdvAccentTextBrush" Color="#FF6C81E9" />
+            <SolidColorBrush x:Key="MdvAccentTintBrush" Color="#FF343A54" />
+            <SolidColorBrush x:Key="MdvAccentMarkBrush" Color="#FF303862" />
+            <SolidColorBrush x:Key="MdvReadingBackgroundBrush" Color="#FF1C1C1C" />
+        </ResourceDictionary>
+    </ResourceDictionary.ThemeDictionaries>
+
+</ResourceDictionary>

@@ -1,0 +1,612 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="MarkdownViewer.App.Views.SettingsPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:views="using:MarkdownViewer.App.Views"
+    xmlns:vm="using:MarkdownViewer.Core.ViewModels"
+    mc:Ignorable="d"
+    NavigationCacheMode="Enabled"
+    Background="Transparent">
+
+    <Page.Resources>
+        <views:ColumnModeLabelConverter x:Key="ColumnModeLabelConverter" />
+
+        <!-- Windows 11 settings card, built from a plain Grid. -->
+        <Style x:Key="SettingsCardStyle" TargetType="Grid">
+            <Setter Property="Background" Value="{ThemeResource CardBackgroundFillColorDefaultBrush}" />
+            <Setter Property="BorderBrush" Value="{ThemeResource CardStrokeColorDefaultBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="{StaticResource OverlayCornerRadius}" />
+            <Setter Property="Padding" Value="16,12" />
+            <Setter Property="MinHeight" Value="68" />
+            <Setter Property="ColumnSpacing" Value="16" />
+        </Style>
+
+        <Style x:Key="SettingsCardIconStyle" TargetType="FontIcon">
+            <Setter Property="FontFamily" Value="{ThemeResource SymbolThemeFontFamily}" />
+            <Setter Property="FontSize" Value="20" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="Foreground" Value="{ThemeResource TextFillColorPrimaryBrush}" />
+        </Style>
+
+        <Style x:Key="SettingsCardTitleStyle" TargetType="TextBlock" BasedOn="{StaticResource BodyTextBlockStyle}">
+            <Setter Property="TextWrapping" Value="WrapWholeWords" />
+        </Style>
+
+        <Style x:Key="SettingsCardDescriptionStyle" TargetType="TextBlock" BasedOn="{StaticResource CaptionTextBlockStyle}">
+            <Setter Property="Foreground" Value="{ThemeResource TextFillColorSecondaryBrush}" />
+            <Setter Property="TextWrapping" Value="WrapWholeWords" />
+        </Style>
+
+        <Style x:Key="SettingsSectionHeaderStyle" TargetType="TextBlock" BasedOn="{StaticResource BodyStrongTextBlockStyle}">
+            <Setter Property="Margin" Value="1,24,0,6" />
+        </Style>
+
+        <Style x:Key="CardToggleSwitchStyle" TargetType="ToggleSwitch">
+            <Setter Property="MinWidth" Value="0" />
+            <Setter Property="HorizontalAlignment" Value="Right" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+        </Style>
+    </Page.Resources>
+
+    <Grid x:Name="LayoutRoot">
+        <VisualStateManager.VisualStateGroups>
+            <VisualStateGroup x:Name="WidthStates">
+                <VisualState x:Name="Wide">
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="1100" />
+                    </VisualState.StateTriggers>
+                    <VisualState.Setters>
+                        <Setter Target="PreviewCard.(Grid.Row)" Value="0" />
+                        <Setter Target="PreviewCard.(Grid.Column)" Value="1" />
+                        <Setter Target="PreviewCard.Margin" Value="24,92,0,0" />
+                        <Setter Target="PreviewCard.Width" Value="300" />
+                        <Setter Target="PreviewCard.HorizontalAlignment" Value="Left" />
+                    </VisualState.Setters>
+                </VisualState>
+                <VisualState x:Name="Narrow">
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="0" />
+                    </VisualState.StateTriggers>
+                </VisualState>
+            </VisualStateGroup>
+        </VisualStateManager.VisualStateGroups>
+
+        <ScrollViewer
+            HorizontalScrollMode="Disabled"
+            HorizontalScrollBarVisibility="Disabled"
+            VerticalScrollBarVisibility="Auto">
+            <Grid
+                MaxWidth="1240"
+                Padding="24,8,32,32"
+                HorizontalAlignment="Stretch">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <!-- ===================== Settings column ===================== -->
+                <StackPanel Grid.Row="0" Grid.Column="0" Spacing="4" MaxWidth="900" HorizontalAlignment="Stretch">
+
+                    <TextBlock
+                        Text="Settings"
+                        Style="{StaticResource TitleTextBlockStyle}"
+                        Margin="0,20,0,4"
+                        AutomationProperties.HeadingLevel="Level1" />
+
+                    <!-- ===== Appearance ===== -->
+                    <TextBlock Text="Appearance" Style="{StaticResource SettingsSectionHeaderStyle}" AutomationProperties.HeadingLevel="Level2" />
+
+                    <!-- App theme -->
+                    <Grid Style="{StaticResource SettingsCardStyle}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <FontIcon Glyph="&#xE706;" Style="{StaticResource SettingsCardIconStyle}" />
+                        <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                            <TextBlock Text="App theme" Style="{StaticResource SettingsCardTitleStyle}" />
+                            <TextBlock Text="Applies to the window and the reading surface" Style="{StaticResource SettingsCardDescriptionStyle}" />
+                        </StackPanel>
+                        <StackPanel
+                            Grid.Column="2"
+                            Orientation="Horizontal"
+                            Spacing="20"
+                            VerticalAlignment="Center"
+                            AutomationProperties.Name="App theme">
+                            <RadioButton GroupName="AppTheme" Content="Light" MinWidth="0"
+                                         IsChecked="{x:Bind ViewModel.IsLightSelected, Mode=TwoWay}" />
+                            <RadioButton GroupName="AppTheme" Content="Dark" MinWidth="0"
+                                         IsChecked="{x:Bind ViewModel.IsDarkSelected, Mode=TwoWay}" />
+                            <RadioButton GroupName="AppTheme" Content="Use system setting" MinWidth="0"
+                                         IsChecked="{x:Bind ViewModel.IsSystemSelected, Mode=TwoWay}" />
+                        </StackPanel>
+                    </Grid>
+
+                    <!-- Accent color -->
+                    <Expander
+                        IsExpanded="True"
+                        HorizontalAlignment="Stretch"
+                        HorizontalContentAlignment="Stretch"
+                        Padding="52,16,16,16"
+                        AutomationProperties.Name="Accent color">
+                        <Expander.Header>
+                            <Grid MinHeight="68" Padding="0,12" ColumnSpacing="16">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <FontIcon Glyph="&#xE790;" Style="{StaticResource SettingsCardIconStyle}" />
+                                <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                    <TextBlock Text="Accent color" Style="{StaticResource SettingsCardTitleStyle}" />
+                                    <TextBlock Text="Tabs, selection, links, buttons and find highlights" Style="{StaticResource SettingsCardDescriptionStyle}" />
+                                </StackPanel>
+                                <TextBlock
+                                    Grid.Column="2"
+                                    Text="Use Windows accent color"
+                                    VerticalAlignment="Center"
+                                    Style="{StaticResource SettingsCardDescriptionStyle}" />
+                                <ToggleSwitch
+                                    Grid.Column="3"
+                                    Style="{StaticResource CardToggleSwitchStyle}"
+                                    OnContent=""
+                                    OffContent=""
+                                    AutomationProperties.Name="Use Windows accent color"
+                                    IsEnabled="{x:Bind ViewModel.IsWindowsAccentAvailable, Mode=OneWay}"
+                                    IsOn="{x:Bind ViewModel.UseWindowsAccent, Mode=TwoWay}" />
+                            </Grid>
+                        </Expander.Header>
+
+                        <StackPanel Spacing="14">
+                            <!-- ItemsRepeater is a FrameworkElement, so IsEnabled/Opacity live on this wrapper; disabling it flows to the swatch buttons. -->
+                            <ContentControl
+                                HorizontalAlignment="Stretch"
+                                HorizontalContentAlignment="Stretch"
+                                VerticalContentAlignment="Stretch"
+                                IsTabStop="False"
+                                IsEnabled="{x:Bind views:SettingsPage.Not(ViewModel.UseWindowsAccent), Mode=OneWay}"
+                                Opacity="{x:Bind views:SettingsPage.EnabledOpacity(ViewModel.UseWindowsAccent), Mode=OneWay}">
+                                <ItemsRepeater
+                                    ItemsSource="{x:Bind ViewModel.AccentOptions, Mode=OneWay}"
+                                    TabFocusNavigation="Once"
+                                    XYFocusKeyboardNavigation="Enabled"
+                                    AutomationProperties.Name="Accent colors">
+                                    <ItemsRepeater.Layout>
+                                        <UniformGridLayout
+                                            MinItemWidth="80"
+                                            MinItemHeight="96"
+                                            MinColumnSpacing="8"
+                                            MinRowSpacing="8"
+                                            ItemsStretch="Fill" />
+                                    </ItemsRepeater.Layout>
+                                    <ItemsRepeater.ItemTemplate>
+                                        <DataTemplate x:DataType="vm:AccentOptionViewModel">
+                                            <Button
+                                                HorizontalAlignment="Stretch"
+                                                VerticalAlignment="Stretch"
+                                                HorizontalContentAlignment="Center"
+                                                Padding="4,8"
+                                                Background="Transparent"
+                                                BorderBrush="Transparent"
+                                                Command="{x:Bind views:SettingsPage.SharedViewModel.SelectAccentCommand}"
+                                                CommandParameter="{x:Bind}"
+                                                AutomationProperties.Name="{x:Bind AutomationName, Mode=OneWay}"
+                                                ToolTipService.ToolTip="{x:Bind AutomationName, Mode=OneWay}">
+                                                <StackPanel Spacing="6" HorizontalAlignment="Center">
+                                                    <Grid Width="48" Height="48" HorizontalAlignment="Center">
+                                                        <!-- Selection ring -->
+                                                        <Border
+                                                            CornerRadius="11"
+                                                            BorderThickness="2"
+                                                            BorderBrush="{ThemeResource TextFillColorPrimaryBrush}"
+                                                            Visibility="{x:Bind IsSelected, Mode=OneWay}" />
+                                                        <Border
+                                                            Width="40"
+                                                            Height="40"
+                                                            CornerRadius="8"
+                                                            Background="{x:Bind views:SettingsPage.HexToBrush(Hex), Mode=OneWay}">
+                                                            <FontIcon
+                                                                Glyph="&#xE73E;"
+                                                                FontSize="16"
+                                                                HorizontalAlignment="Center"
+                                                                VerticalAlignment="Center"
+                                                                Foreground="{x:Bind views:SettingsPage.HexToBrush(CheckGlyphColorHex), Mode=OneWay}"
+                                                                Visibility="{x:Bind IsSelected, Mode=OneWay}" />
+                                                        </Border>
+                                                    </Grid>
+                                                    <TextBlock
+                                                        Text="{x:Bind Name, Mode=OneWay}"
+                                                        Style="{StaticResource CaptionTextBlockStyle}"
+                                                        HorizontalAlignment="Center"
+                                                        TextTrimming="CharacterEllipsis" />
+                                                    <TextBlock
+                                                        Text="{x:Bind Hex, Mode=OneWay}"
+                                                        FontFamily="Cascadia Mono, Consolas"
+                                                        FontSize="11"
+                                                        HorizontalAlignment="Center"
+                                                        Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                                </StackPanel>
+                                            </Button>
+                                        </DataTemplate>
+                                    </ItemsRepeater.ItemTemplate>
+                                </ItemsRepeater>
+                            </ContentControl>
+
+                            <StackPanel Orientation="Horizontal" Spacing="12">
+                                <DropDownButton
+                                    AutomationProperties.Name="Custom color"
+                                    IsEnabled="{x:Bind views:SettingsPage.Not(ViewModel.UseWindowsAccent), Mode=OneWay}">
+                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                        <FontIcon Glyph="&#xE710;" FontSize="12" />
+                                        <TextBlock Text="Custom color…" />
+                                    </StackPanel>
+                                    <DropDownButton.Flyout>
+                                        <Flyout Placement="BottomEdgeAlignedLeft">
+                                            <StackPanel Spacing="12">
+                                                <ColorPicker
+                                                    x:Name="CustomColorPicker"
+                                                    IsAlphaEnabled="False"
+                                                    IsMoreButtonVisible="False"
+                                                    IsColorSliderVisible="True"
+                                                    IsColorChannelTextInputVisible="False"
+                                                    IsHexInputVisible="True"
+                                                    Color="{x:Bind views:SettingsPage.HexToColor(ViewModel.CustomAccentHex), Mode=OneWay}" />
+                                                <TextBlock
+                                                    MaxWidth="320"
+                                                    HorizontalAlignment="Left"
+                                                    TextWrapping="WrapWholeWords"
+                                                    Style="{StaticResource CaptionTextBlockStyle}"
+                                                    Foreground="{ThemeResource SystemFillColorCriticalBrush}"
+                                                    Text="{x:Bind ViewModel.CustomAccentError, Mode=OneWay}"
+                                                    Visibility="{x:Bind ViewModel.HasCustomAccentError, Mode=OneWay}" />
+                                                <Button
+                                                    HorizontalAlignment="Right"
+                                                    MinWidth="96"
+                                                    Content="Apply"
+                                                    Style="{StaticResource AccentButtonStyle}"
+                                                    Command="{x:Bind ViewModel.ApplyCustomAccentCommand}"
+                                                    CommandParameter="{x:Bind views:SettingsPage.ColorToHex(CustomColorPicker.Color), Mode=OneWay}" />
+                                            </StackPanel>
+                                        </Flyout>
+                                    </DropDownButton.Flyout>
+                                </DropDownButton>
+                                <TextBlock
+                                    VerticalAlignment="Center"
+                                    Text="Pick any color. The app adjusts the shade so text on it stays readable (4.5:1)."
+                                    Style="{StaticResource SettingsCardDescriptionStyle}" />
+                            </StackPanel>
+                        </StackPanel>
+                    </Expander>
+
+                    <!-- ===== Reading ===== -->
+                    <TextBlock Text="Reading" Style="{StaticResource SettingsSectionHeaderStyle}" AutomationProperties.HeadingLevel="Level2" />
+
+                    <!-- Density -->
+                    <Grid Style="{StaticResource SettingsCardStyle}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <FontIcon Glyph="&#xE8FD;" Style="{StaticResource SettingsCardIconStyle}" />
+                        <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                            <TextBlock Text="Reading density" Style="{StaticResource SettingsCardTitleStyle}" />
+                            <TextBlock Text="Ctrl+1, Ctrl+2, Ctrl+3 switch while reading" Style="{StaticResource SettingsCardDescriptionStyle}" />
+                        </StackPanel>
+                        <StackPanel
+                            Grid.Column="2"
+                            Orientation="Horizontal"
+                            Spacing="20"
+                            VerticalAlignment="Center"
+                            AutomationProperties.Name="Reading density">
+                            <RadioButton GroupName="Density" Content="Comfortable" MinWidth="0"
+                                         IsChecked="{x:Bind ViewModel.IsComfortable, Mode=TwoWay}" />
+                            <RadioButton GroupName="Density" Content="Compact" MinWidth="0"
+                                         IsChecked="{x:Bind ViewModel.IsCompact, Mode=TwoWay}" />
+                            <RadioButton GroupName="Density" Content="Ultra" MinWidth="0"
+                                         IsChecked="{x:Bind ViewModel.IsUltra, Mode=TwoWay}" />
+                        </StackPanel>
+                    </Grid>
+
+                    <!-- Columns -->
+                    <Grid Style="{StaticResource SettingsCardStyle}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <FontIcon Glyph="&#xE8A9;" Style="{StaticResource SettingsCardIconStyle}" />
+                        <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                            <TextBlock Text="Columns" Style="{StaticResource SettingsCardTitleStyle}" />
+                            <TextBlock Text="Auto adds a column when each can hold 60 or more characters" Style="{StaticResource SettingsCardDescriptionStyle}" />
+                        </StackPanel>
+                        <ComboBox
+                            Grid.Column="2"
+                            MinWidth="200"
+                            VerticalAlignment="Center"
+                            AutomationProperties.Name="Columns"
+                            ItemsSource="{x:Bind ViewModel.ColumnModes, Mode=OneWay}"
+                            SelectedItem="{x:Bind ViewModel.ColumnMode, Mode=TwoWay}">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Converter={StaticResource ColumnModeLabelConverter}}" />
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+                    </Grid>
+
+                    <!-- Wrap code -->
+                    <Grid Style="{StaticResource SettingsCardStyle}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <FontIcon Glyph="&#xE943;" Style="{StaticResource SettingsCardIconStyle}" />
+                        <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                            <TextBlock Text="Wrap long code lines" Style="{StaticResource SettingsCardTitleStyle}" />
+                            <TextBlock Text="When off, wide code blocks scroll sideways" Style="{StaticResource SettingsCardDescriptionStyle}" />
+                        </StackPanel>
+                        <ToggleSwitch
+                            Grid.Column="2"
+                            Style="{StaticResource CardToggleSwitchStyle}"
+                            AutomationProperties.Name="Wrap long code lines"
+                            IsOn="{x:Bind ViewModel.WrapCodeLines, Mode=TwoWay}" />
+                    </Grid>
+
+                    <!-- Remote images -->
+                    <Grid Style="{StaticResource SettingsCardStyle}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <FontIcon Glyph="&#xEB9F;" Style="{StaticResource SettingsCardIconStyle}" />
+                        <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                            <TextBlock Text="Load remote images" Style="{StaticResource SettingsCardTitleStyle}" />
+                            <TextBlock Text="Off by default to protect your privacy" Style="{StaticResource SettingsCardDescriptionStyle}" />
+                        </StackPanel>
+                        <ToggleSwitch
+                            Grid.Column="2"
+                            Style="{StaticResource CardToggleSwitchStyle}"
+                            AutomationProperties.Name="Load remote images"
+                            IsOn="{x:Bind ViewModel.LoadRemoteContent, Mode=TwoWay}" />
+                    </Grid>
+
+                    <!-- ===== Default app ===== -->
+                    <TextBlock Text="Default app" Style="{StaticResource SettingsSectionHeaderStyle}" AutomationProperties.HeadingLevel="Level2" />
+
+                    <Grid Style="{StaticResource SettingsCardStyle}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <FontIcon Glyph="&#xE8A5;" Style="{StaticResource SettingsCardIconStyle}" />
+                        <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                            <TextBlock Text="Default app for Markdown files" Style="{StaticResource SettingsCardTitleStyle}" />
+                            <!-- Caution color while not default, secondary text once it is. -->
+                            <TextBlock
+                                Text="{x:Bind ViewModel.DefaultAppStatus, Mode=OneWay}"
+                                Style="{StaticResource SettingsCardDescriptionStyle}"
+                                Foreground="{ThemeResource SystemFillColorCautionBrush}"
+                                Visibility="{x:Bind views:SettingsPage.NotVisible(ViewModel.IsDefaultApp), Mode=OneWay}" />
+                            <TextBlock
+                                Text="{x:Bind ViewModel.DefaultAppStatus, Mode=OneWay}"
+                                Style="{StaticResource SettingsCardDescriptionStyle}"
+                                Visibility="{x:Bind ViewModel.IsDefaultApp, Mode=OneWay}" />
+                        </StackPanel>
+                        <Button
+                            Grid.Column="2"
+                            VerticalAlignment="Center"
+                            Content="Open Default apps"
+                            Style="{StaticResource AccentButtonStyle}"
+                            Command="{x:Bind ViewModel.OpenDefaultAppsCommand}" />
+                    </Grid>
+
+                    <!-- ===== Keyboard ===== -->
+                    <TextBlock Text="Keyboard" Style="{StaticResource SettingsSectionHeaderStyle}" AutomationProperties.HeadingLevel="Level2" />
+
+                    <Grid Style="{StaticResource SettingsCardStyle}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <FontIcon Glyph="&#xE765;" Style="{StaticResource SettingsCardIconStyle}" />
+                        <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                            <TextBlock Text="Keyboard shortcuts" Style="{StaticResource SettingsCardTitleStyle}" />
+                            <TextBlock Text="Every command has a shortcut. Press F1 or Ctrl+/ any time." Style="{StaticResource SettingsCardDescriptionStyle}" />
+                        </StackPanel>
+                        <Button
+                            Grid.Column="2"
+                            VerticalAlignment="Center"
+                            Content="View shortcuts (Ctrl+/)"
+                            Command="{x:Bind ViewModel.ShowShortcutsCommand}" />
+                    </Grid>
+
+                    <!-- ===== About ===== -->
+                    <TextBlock Text="About" Style="{StaticResource SettingsSectionHeaderStyle}" AutomationProperties.HeadingLevel="Level2" />
+
+                    <Grid Style="{StaticResource SettingsCardStyle}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <Image
+                            Width="24"
+                            Height="24"
+                            VerticalAlignment="Center"
+                            Source="ms-appx:///Assets/Square44x44Logo.png"
+                            AutomationProperties.AccessibilityView="Raw" />
+                        <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                            <TextBlock Text="Markdown Viewer - Simple" Style="{StaticResource SettingsCardTitleStyle}" />
+                            <TextBlock Text="{x:Bind views:SettingsPage.VersionText}" Style="{StaticResource SettingsCardDescriptionStyle}" IsTextSelectionEnabled="True" />
+                            <TextBlock Text="Works offline. Documents never leave your PC." Style="{StaticResource SettingsCardDescriptionStyle}" />
+                        </StackPanel>
+                        <Button
+                            Grid.Column="2"
+                            VerticalAlignment="Center"
+                            Command="{x:Bind ViewModel.ResetToDefaultsCommand}"
+                            AutomationProperties.Name="Reset settings">
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <FontIcon Glyph="&#xE777;" FontSize="14" />
+                                <TextBlock Text="Reset settings" />
+                            </StackPanel>
+                        </Button>
+                    </Grid>
+                </StackPanel>
+
+                <!-- ===================== Live preview ===================== -->
+                <Border
+                    x:Name="PreviewCard"
+                    Grid.Row="1"
+                    Grid.Column="0"
+                    Margin="0,24,0,0"
+                    MaxWidth="900"
+                    HorizontalAlignment="Stretch"
+                    VerticalAlignment="Top"
+                    Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                    BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                    BorderThickness="1"
+                    CornerRadius="8"
+                    AutomationProperties.Name="Preview"
+                    AutomationProperties.LandmarkType="Custom"
+                    AutomationProperties.LocalizedLandmarkType="Preview">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="36" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+
+                        <!-- Fake tab strip -->
+                        <Grid Background="{ThemeResource SolidBackgroundFillColorBaseBrush}" Padding="8,0" CornerRadius="8,8,0,0">
+                            <StackPanel Orientation="Horizontal" Spacing="2" VerticalAlignment="Bottom">
+                                <Border
+                                    Height="28"
+                                    Padding="12,0"
+                                    Background="{ThemeResource LayerFillColorDefaultBrush}"
+                                    BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                                    BorderThickness="1,1,1,0"
+                                    CornerRadius="6,6,0,0">
+                                    <TextBlock Text="README.md" FontSize="11.5" VerticalAlignment="Center" />
+                                </Border>
+                                <Border Height="28" Padding="12,0">
+                                    <TextBlock Text="notes.md" FontSize="11.5" VerticalAlignment="Center" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                </Border>
+                            </StackPanel>
+                        </Grid>
+
+                        <StackPanel
+                            Grid.Row="1"
+                            Padding="16,14"
+                            Spacing="{x:Bind views:SettingsPage.PreviewGap(ViewModel.Density), Mode=OneWay}"
+                            BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                            BorderThickness="0,1,0,0">
+                            <TextBlock
+                                Text="{x:Bind views:SettingsPage.PreviewCaption(ViewModel.Density), Mode=OneWay}"
+                                Style="{StaticResource CaptionTextBlockStyle}"
+                                Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                            <TextBlock
+                                Text="Orbit Sync"
+                                FontWeight="SemiBold"
+                                FontSize="{x:Bind views:SettingsPage.PreviewHeadingSize(ViewModel.Density), Mode=OneWay}" />
+                            <TextBlock
+                                TextWrapping="Wrap"
+                                FontSize="{x:Bind views:SettingsPage.PreviewFontSize(ViewModel.Density), Mode=OneWay}">
+                                <Run Text="Two-way folder sync for teams. See the" />
+                                <Run
+                                    Text="install guide"
+                                    TextDecorations="Underline"
+                                    Foreground="{x:Bind views:SettingsPage.HexToBrush(ViewModel.PreviewShades.Text), Mode=OneWay}" />
+                                <Run Text="to get started." />
+                            </TextBlock>
+                            <StackPanel Orientation="Horizontal" Spacing="4">
+                                <TextBlock
+                                    Text="Find:"
+                                    VerticalAlignment="Center"
+                                    FontSize="{x:Bind views:SettingsPage.PreviewFontSize(ViewModel.Density), Mode=OneWay}" />
+                                <Border
+                                    Padding="2,0"
+                                    CornerRadius="2"
+                                    VerticalAlignment="Center"
+                                    Background="{x:Bind views:SettingsPage.HexToBrush(ViewModel.PreviewShades.Fill), Mode=OneWay}">
+                                    <TextBlock
+                                        Text="sync"
+                                        FontSize="{x:Bind views:SettingsPage.PreviewFontSize(ViewModel.Density), Mode=OneWay}"
+                                        Foreground="{x:Bind views:SettingsPage.HexToBrush(ViewModel.PreviewShades.OnFill), Mode=OneWay}" />
+                                </Border>
+                                <TextBlock
+                                    Text="and"
+                                    VerticalAlignment="Center"
+                                    FontSize="{x:Bind views:SettingsPage.PreviewFontSize(ViewModel.Density), Mode=OneWay}" />
+                                <Border
+                                    Padding="2,0"
+                                    CornerRadius="2"
+                                    VerticalAlignment="Center"
+                                    Background="{x:Bind views:SettingsPage.HexToBrush(ViewModel.PreviewShades.Mark), Mode=OneWay}">
+                                    <TextBlock
+                                        Text="sync"
+                                        FontSize="{x:Bind views:SettingsPage.PreviewFontSize(ViewModel.Density), Mode=OneWay}" />
+                                </Border>
+                            </StackPanel>
+                            <Border
+                                Padding="10,6"
+                                CornerRadius="6"
+                                Background="{ThemeResource SubtleFillColorSecondaryBrush}"
+                                BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                                BorderThickness="1">
+                                <TextBlock Text="orbit sync start" FontFamily="Cascadia Mono, Consolas" FontSize="11.5" />
+                            </Border>
+                            <StackPanel Orientation="Horizontal" Spacing="8" Padding="0,4,0,0">
+                                <!-- Static samples: not interactive, hidden from tab order. -->
+                                <Border
+                                    Height="30"
+                                    Padding="12,0"
+                                    CornerRadius="4"
+                                    Background="{x:Bind views:SettingsPage.HexToBrush(ViewModel.PreviewShades.Fill), Mode=OneWay}">
+                                    <TextBlock
+                                        Text="Primary"
+                                        FontSize="12"
+                                        VerticalAlignment="Center"
+                                        Foreground="{x:Bind views:SettingsPage.HexToBrush(ViewModel.PreviewShades.OnFill), Mode=OneWay}" />
+                                </Border>
+                                <Border
+                                    Height="30"
+                                    Padding="12,0"
+                                    CornerRadius="4"
+                                    Background="{ThemeResource ControlFillColorDefaultBrush}"
+                                    BorderBrush="{ThemeResource ControlStrokeColorDefaultBrush}"
+                                    BorderThickness="1">
+                                    <TextBlock Text="Secondary" FontSize="12" VerticalAlignment="Center" />
+                                </Border>
+                                <Border
+                                    Height="30"
+                                    Padding="12,0"
+                                    CornerRadius="4"
+                                    Background="{x:Bind views:SettingsPage.HexToBrush(ViewModel.PreviewShades.Tint), Mode=OneWay}">
+                                    <TextBlock
+                                        Text="Selected"
+                                        FontSize="12"
+                                        VerticalAlignment="Center"
+                                        Foreground="{x:Bind views:SettingsPage.HexToBrush(ViewModel.PreviewShades.Text), Mode=OneWay}" />
+                                </Border>
+                            </StackPanel>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+            </Grid>
+        </ScrollViewer>
+    </Grid>
+</Page>
