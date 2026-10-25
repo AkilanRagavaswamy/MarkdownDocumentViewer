@@ -1,0 +1,741 @@
+/*
+ * Markdown Viewer - Simple — reading surface.
+ * All colors and metrics come from CSS custom properties set by mdv.setAppearance()
+ * (see CONTRACT.md). The values below are light / Compact defaults used until the host applies its own;
+ * they use :where() (zero specificity) so the host's inline :root block always wins.
+ */
+
+:where(:root) {
+  --mdv-bg: #FFFFFF;
+  --mdv-fg: #1B1B1B;
+  --mdv-fg2: #5C5C5C;
+  --mdv-border: #E3E3E3;
+  --mdv-code-bg: #F5F6F8;
+  --mdv-accent-fill: #3F55C4;
+  --mdv-on-accent: #FFFFFF;
+  --mdv-accent-text: #3F55C4;
+  --mdv-accent-tint: #E4E7F5;
+  --mdv-mark: #D4DAF8;
+  --mdv-font-size: 14px;
+  --mdv-line-height: 1.42;
+  --mdv-gap: 7px;
+  --mdv-h1: 21px;
+  --mdv-h2: 16.5px;
+  --mdv-h3: 14.5px;
+  --mdv-code-size: 12.5px;
+  --mdv-pad: 18px 28px;
+  --mdv-columns: 1;
+
+  /* Derived (not part of the bridge). */
+  --mdv-heading-gap-derived: var(--mdv-heading-gap, calc(var(--mdv-gap) * 1.7));
+  --mdv-column-gap: 40px;
+  --mdv-font-text: "Segoe UI Variable Text", "Segoe UI", system-ui, sans-serif;
+  --mdv-font-display: "Segoe UI Variable Display", "Segoe UI", system-ui, sans-serif;
+  --mdv-font-mono: "Cascadia Mono", "Cascadia Code", Consolas, "Courier New", monospace;
+
+  /* GitHub alert status colors (light). Note uses the accent. */
+  --mdv-alert-tip: #1A7F37;
+  --mdv-alert-important: #8250DF;
+  --mdv-alert-warning: #9A6700;
+  --mdv-alert-caution: #CF222E;
+
+  color-scheme: light;
+}
+
+:where(html[data-theme="dark"]) {
+  --mdv-bg: #1C1C1C;
+  --mdv-fg: #FFFFFF;
+  --mdv-fg2: #C5C5C5;
+  --mdv-border: #3B3B3B;
+  --mdv-code-bg: #262626;
+  --mdv-accent-fill: #8C9DF0;
+  --mdv-on-accent: #000000;
+  --mdv-accent-text: #95A5F1;
+  --mdv-accent-tint: #2F3346;
+  --mdv-mark: #3A4170;
+  --mdv-alert-tip: #3FB950;
+  --mdv-alert-important: #A371F7;
+  --mdv-alert-warning: #D29922;
+  --mdv-alert-caution: #F85149;
+  color-scheme: dark;
+}
+
+/* ------------------------------------------------------------------ base */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  background: var(--mdv-bg);
+  color: var(--mdv-fg);
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  scrollbar-width: thin;
+  scrollbar-color: var(--mdv-border) transparent;
+}
+
+body {
+  margin: 0;
+  padding: var(--mdv-pad);
+  background: var(--mdv-bg);
+  color: var(--mdv-fg);
+  font-family: var(--mdv-font-text);
+  font-size: var(--mdv-font-size);
+  line-height: var(--mdv-line-height);
+  overflow-wrap: break-word;
+  user-select: text;
+  -webkit-user-select: text;
+  font-kerning: normal;
+}
+
+::selection {
+  background: var(--mdv-accent-tint);
+  color: var(--mdv-fg);
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--mdv-border);
+  border-radius: 5px;
+  border: 2px solid var(--mdv-bg);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--mdv-fg2);
+}
+
+:focus-visible {
+  outline: 2px solid var(--mdv-accent-fill);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+/* ------------------------------------------------------------- columns */
+
+#mdv-content {
+  column-count: var(--mdv-columns);
+  column-gap: var(--mdv-column-gap);
+  column-rule: 1px solid var(--mdv-border);
+  max-width: none;
+}
+
+html[data-columns="1"] #mdv-content {
+  column-count: 1;
+  column-rule: none;
+}
+
+/*
+ * Paged multi-column reading (2+ columns): the content box is one viewport tall, columns fill
+ * top-to-bottom and overflow sideways, so reading flows down one column and on to the next.
+ * viewer.js turns wheel / keys into horizontal page movement.
+ */
+html[data-paged="true"],
+html[data-paged="true"] body {
+  height: 100%;
+  overflow: hidden;
+}
+
+html[data-paged="true"] body {
+  padding: 0;
+}
+
+html[data-paged="true"] #mdv-content {
+  height: 100vh;
+  padding: var(--mdv-pad);
+  column-fill: auto;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: thin;
+}
+
+/* ------------------------------------------------------------ headings */
+
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 600;
+  color: var(--mdv-fg);
+  break-after: avoid;
+  break-inside: avoid;
+  page-break-after: avoid;
+  scroll-margin-top: 12px;
+}
+
+h1 {
+  margin: var(--mdv-heading-gap-derived) 0 var(--mdv-gap);
+  font-family: var(--mdv-font-display);
+  font-size: var(--mdv-h1);
+  line-height: 1.2;
+}
+
+h2 {
+  position: relative;
+  margin: var(--mdv-heading-gap-derived) 0 var(--mdv-gap);
+  padding-bottom: 4px;
+  font-size: var(--mdv-h2);
+  line-height: 1.25;
+  border-bottom: 1px solid var(--mdv-border);
+}
+
+h3 {
+  margin: calc(var(--mdv-gap) * 0.6) 0 4px;
+  font-size: var(--mdv-h3);
+  line-height: 1.3;
+}
+
+h4, h5, h6 {
+  margin: calc(var(--mdv-gap) * 0.6) 0 4px;
+  font-size: var(--mdv-font-size);
+  line-height: 1.3;
+}
+
+h6 {
+  color: var(--mdv-fg2);
+}
+
+#mdv-content > :first-child,
+#mdv-content > .mdv-section:first-child > h2,
+.mdv-section-body > :first-child {
+  margin-top: 0;
+}
+
+/* Fold chevron added to every H2 by viewer.js. */
+.mdv-fold {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.15em;
+  height: 1.15em;
+  margin: 0 4px 0 -2px;
+  padding: 0;
+  border: none;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--mdv-fg2);
+  vertical-align: -0.12em;
+  cursor: pointer;
+  opacity: 0.6;
+}
+
+.mdv-fold:hover,
+.mdv-fold:focus-visible {
+  opacity: 1;
+  background: var(--mdv-accent-tint);
+  color: var(--mdv-accent-text);
+}
+
+.mdv-fold svg {
+  width: 0.7em;
+  height: 0.7em;
+  transition: transform 120ms ease-out;
+}
+
+.mdv-folded > h2 .mdv-fold svg {
+  transform: rotate(-90deg);
+}
+
+.mdv-folded > .mdv-section-body {
+  display: none;
+}
+
+.mdv-folded > h2 {
+  color: var(--mdv-fg2);
+}
+
+/* ------------------------------------------------------------- blocks */
+
+p,
+ul,
+ol,
+dl,
+pre,
+table,
+blockquote,
+details,
+figure,
+.mdv-table-wrap,
+.markdown-alert {
+  margin: 0 0 var(--mdv-gap);
+}
+
+ul,
+ol {
+  padding-left: 20px;
+}
+
+li + li,
+li > ul,
+li > ol {
+  margin-top: 2px;
+}
+
+li > ul,
+li > ol,
+li > p {
+  margin-bottom: 0;
+}
+
+dt {
+  font-weight: 600;
+}
+
+dd {
+  margin: 0 0 4px 16px;
+}
+
+hr {
+  height: 0;
+  margin: var(--mdv-heading-gap-derived) 0;
+  border: none;
+  border-top: 1px solid var(--mdv-border);
+}
+
+a {
+  color: var(--mdv-accent-text);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
+}
+
+a:hover {
+  text-decoration-thickness: 2px;
+}
+
+strong,
+b {
+  font-weight: 600;
+}
+
+mark {
+  background: var(--mdv-mark);
+  color: inherit;
+  border-radius: 2px;
+  padding: 0 1px;
+}
+
+kbd {
+  display: inline-block;
+  min-width: 1.6em;
+  padding: 0 5px;
+  border: 1px solid var(--mdv-border);
+  border-bottom-width: 2px;
+  border-radius: 4px;
+  background: var(--mdv-code-bg);
+  font-family: var(--mdv-font-text);
+  font-size: 0.85em;
+  line-height: 1.5;
+  text-align: center;
+}
+
+blockquote {
+  padding: 0 12px;
+  border-left: 3px solid var(--mdv-border);
+  color: var(--mdv-fg2);
+  break-inside: avoid;
+}
+
+blockquote > :last-child {
+  margin-bottom: 0;
+}
+
+details {
+  padding: 6px 10px;
+  border: 1px solid var(--mdv-border);
+  border-radius: 6px;
+}
+
+summary {
+  cursor: pointer;
+  font-weight: 600;
+}
+
+/* --------------------------------------------------------------- code */
+
+code,
+pre,
+samp {
+  font-family: var(--mdv-font-mono);
+  font-size: var(--mdv-code-size);
+}
+
+:not(pre) > code {
+  padding: 1px 5px;
+  border-radius: 4px;
+  background: var(--mdv-code-bg);
+  overflow-wrap: anywhere;
+}
+
+pre {
+  padding: 8px 12px;
+  border: 1px solid var(--mdv-border);
+  border-radius: 6px;
+  background: var(--mdv-code-bg);
+  line-height: 1.45;
+  overflow-x: auto;
+  white-space: pre;
+  tab-size: 4;
+  break-inside: avoid;
+}
+
+pre > code {
+  padding: 0;
+  background: transparent;
+  font-size: inherit;
+  white-space: inherit;
+}
+
+html[data-wrap="true"] pre {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+/* "View source": the raw Markdown as one escaped block. */
+.mdv-source,
+pre.mdv-source {
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  font-family: var(--mdv-font-mono);
+  font-size: var(--mdv-code-size);
+  line-height: 1.5;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  break-inside: auto;
+}
+
+.mdv-source pre {
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  white-space: pre-wrap;
+  break-inside: auto;
+}
+
+html[data-wrap="false"] .mdv-source,
+html[data-wrap="false"] .mdv-source pre {
+  white-space: pre;
+  overflow-x: auto;
+}
+
+/* -------------------------------------------------------------- tables */
+
+.mdv-table-wrap {
+  max-width: 100%;
+  max-height: 80vh;
+  overflow: auto;
+  border: 1px solid var(--mdv-border);
+  border-radius: 6px;
+  break-inside: avoid;
+}
+
+.mdv-table-wrap > table {
+  margin: 0;
+  border-style: hidden; /* outer edge drawn by the wrapper */
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--mdv-code-size);
+  font-variant-numeric: tabular-nums;
+  break-inside: avoid;
+}
+
+th,
+td {
+  padding: 4px 8px;
+  border: 1px solid var(--mdv-border);
+  text-align: left;
+  vertical-align: top;
+}
+
+th {
+  font-weight: 600;
+}
+
+thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: var(--mdv-code-bg);
+  box-shadow: inset 0 -1px 0 var(--mdv-border);
+}
+
+thead tr {
+  background: var(--mdv-code-bg);
+}
+
+th[align="center"], td[align="center"] { text-align: center; }
+th[align="right"],  td[align="right"]  { text-align: right; }
+
+/* ---------------------------------------------------------- task lists */
+
+ul.contains-task-list,
+ul:has(> li > input[type="checkbox"]) {
+  padding-left: 2px;
+  list-style: none;
+}
+
+li.task-list-item {
+  list-style: none;
+}
+
+li.task-list-item > input[type="checkbox"],
+.task-list-item-checkbox {
+  width: 1em;
+  height: 1em;
+  margin: 0 8px 0 0;
+  vertical-align: -0.12em;
+  accent-color: var(--mdv-accent-fill);
+}
+
+li.task-list-item ul.contains-task-list {
+  padding-left: 22px;
+}
+
+/* -------------------------------------------------------- GitHub alerts */
+
+.markdown-alert {
+  --mdv-alert-color: var(--mdv-accent-text);
+  padding: 8px 12px;
+  border: 1px solid var(--mdv-border);
+  border-left: 3px solid var(--mdv-alert-color);
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--mdv-alert-color) 7%, var(--mdv-bg));
+  break-inside: avoid;
+}
+
+.markdown-alert > :last-child {
+  margin-bottom: 0;
+}
+
+.markdown-alert-note      { --mdv-alert-color: var(--mdv-accent-text); background: var(--mdv-accent-tint); }
+.markdown-alert-tip       { --mdv-alert-color: var(--mdv-alert-tip); }
+.markdown-alert-important { --mdv-alert-color: var(--mdv-alert-important); }
+.markdown-alert-warning   { --mdv-alert-color: var(--mdv-alert-warning); }
+.markdown-alert-caution   { --mdv-alert-color: var(--mdv-alert-caution); }
+
+.markdown-alert-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 0 2px;
+  color: var(--mdv-alert-color);
+  font-size: var(--mdv-code-size);
+  font-weight: 600;
+}
+
+.markdown-alert-title svg {
+  width: 14px;
+  height: 14px;
+  flex: none;
+  fill: currentColor;
+}
+
+/* -------------------------------------------------------------- images */
+
+img {
+  max-width: 100%;
+  max-height: 50vh;
+  height: auto;
+  border-radius: 4px;
+  cursor: zoom-in;
+  break-inside: avoid;
+}
+
+img.mdv-expanded {
+  max-height: none;
+  cursor: zoom-out;
+}
+
+html[data-paged="true"] img.mdv-expanded {
+  max-height: calc(100vh - 48px);
+}
+
+a img {
+  cursor: pointer;
+}
+
+/* Remote image blocked by the host's privacy setting (CSP); keep layout calm. */
+img.mdv-blocked {
+  display: inline-block;
+  min-width: 120px;
+  min-height: 24px;
+  padding: 4px 8px;
+  border: 1px dashed var(--mdv-border);
+  color: var(--mdv-fg2);
+  font-size: var(--mdv-code-size);
+  cursor: default;
+}
+
+figure {
+  break-inside: avoid;
+}
+
+figcaption {
+  color: var(--mdv-fg2);
+  font-size: var(--mdv-code-size);
+}
+
+/* ------------------------------------------------------------ footnotes */
+
+.footnotes {
+  margin-top: var(--mdv-heading-gap-derived);
+  color: var(--mdv-fg2);
+  font-size: 0.9em;
+}
+
+.footnotes hr {
+  margin: 0 0 var(--mdv-gap);
+}
+
+sup a,
+.footnote-ref {
+  text-decoration: none;
+}
+
+/* ---------------------------------------------------------------- find */
+
+mark.mdv-hit {
+  background: var(--mdv-mark);
+  color: inherit;
+  border-radius: 2px;
+  padding: 0;
+}
+
+mark.mdv-hit.current {
+  background: var(--mdv-accent-fill);
+  color: var(--mdv-on-accent);
+  outline: 1px solid var(--mdv-accent-fill);
+}
+
+/* ------------------------------------------------------------- motion */
+
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition: none !important;
+    animation: none !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* --------------------------------------------------------------- print */
+
+@media print {
+  :root,
+  html[data-theme="dark"] {
+    --mdv-bg: #FFFFFF;
+    --mdv-fg: #000000;
+    --mdv-fg2: #333333;
+    --mdv-border: #BBBBBB;
+    --mdv-code-bg: #F4F4F4;
+    --mdv-accent-text: #000000;
+    --mdv-accent-tint: #F0F0F0;
+    --mdv-alert-tip: #000000;
+    --mdv-alert-important: #000000;
+    --mdv-alert-warning: #000000;
+    --mdv-alert-caution: #000000;
+    color-scheme: light;
+  }
+
+  @page {
+    margin: 16mm 14mm;
+  }
+
+  html,
+  body,
+  html[data-paged="true"],
+  html[data-paged="true"] body {
+    height: auto;
+    overflow: visible;
+    background: #FFFFFF;
+    color: #000000;
+  }
+
+  body,
+  html[data-paged="true"] body {
+    padding: 0;
+    font-size: 10.5pt;
+    line-height: 1.4;
+  }
+
+  #mdv-content,
+  html[data-paged="true"] #mdv-content,
+  html[data-columns="1"] #mdv-content {
+    height: auto;
+    padding: 0;
+    overflow: visible;
+    column-count: 2;
+    column-gap: 24px;
+    column-rule: 1px solid #DDDDDD;
+    column-fill: balance;
+  }
+
+  .mdv-fold {
+    display: none !important;
+  }
+
+  .mdv-folded > .mdv-section-body {
+    display: block;
+  }
+
+  .mdv-folded > h2 {
+    color: #000000;
+  }
+
+  a {
+    color: #000000;
+  }
+
+  pre {
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    overflow: visible;
+  }
+
+  .mdv-table-wrap {
+    max-height: none;
+    overflow: visible;
+  }
+
+  thead th {
+    position: static;
+  }
+
+  img,
+  img.mdv-expanded {
+    max-height: 40vh;
+  }
+
+  mark.mdv-hit,
+  mark.mdv-hit.current {
+    background: transparent;
+    color: inherit;
+    outline: none;
+  }
+
+  .markdown-alert,
+  .markdown-alert-note {
+    background: transparent;
+  }
+}

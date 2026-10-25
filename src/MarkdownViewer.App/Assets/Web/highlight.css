@@ -1,0 +1,125 @@
+/*
+ * Markdown Viewer - Simple — code token colors (light and dark).
+ * Class names match highlight.js 11.x, so this file also styles the official build.
+ */
+
+:root {
+  --mdv-hl-keyword: #0B5CAD;
+  --mdv-hl-string: #9A4A00;
+  --mdv-hl-comment: #6A737D;
+  --mdv-hl-number: #005CC5;
+  --mdv-hl-title: #6F42C1;
+  --mdv-hl-attr: #22863A;
+  --mdv-hl-add-bg: #E6FFEC;
+  --mdv-hl-del-bg: #FFEBE9;
+}
+
+html[data-theme="dark"] {
+  --mdv-hl-keyword: #7FB8FF;
+  --mdv-hl-string: #E6B673;
+  --mdv-hl-comment: #8B949E;
+  --mdv-hl-number: #79C0FF;
+  --mdv-hl-title: #D2A8FF;
+  --mdv-hl-attr: #7EE787;
+  --mdv-hl-add-bg: rgba(46, 160, 67, 0.18);
+  --mdv-hl-del-bg: rgba(248, 81, 73, 0.18);
+}
+
+.hljs {
+  color: inherit;
+  background: transparent;
+}
+
+.hljs-keyword,
+.hljs-selector-tag,
+.hljs-built_in,
+.hljs-type,
+.hljs-doctag {
+  color: var(--mdv-hl-keyword);
+}
+
+.hljs-string,
+.hljs-regexp,
+.hljs-template-tag,
+.hljs-template-variable,
+.hljs-char\.escape_ {
+  color: var(--mdv-hl-string);
+}
+
+.hljs-comment,
+.hljs-quote {
+  color: var(--mdv-hl-comment);
+  font-style: italic;
+}
+
+.hljs-number,
+.hljs-literal,
+.hljs-symbol,
+.hljs-bullet,
+.hljs-link {
+  color: var(--mdv-hl-number);
+}
+
+.hljs-title,
+.hljs-title\.function_,
+.hljs-title\.class_,
+.hljs-section,
+.hljs-name,
+.hljs-selector-id,
+.hljs-selector-class {
+  color: var(--mdv-hl-title);
+}
+
+.hljs-attr,
+.hljs-attribute,
+.hljs-property,
+.hljs-variable,
+.hljs-params,
+.hljs-selector-attr,
+.hljs-selector-pseudo {
+  color: var(--mdv-hl-attr);
+}
+
+.hljs-meta,
+.hljs-meta .hljs-keyword {
+  color: var(--mdv-hl-comment);
+}
+
+.hljs-tag {
+  color: var(--mdv-hl-title);
+}
+
+.hljs-addition {
+  background: var(--mdv-hl-add-bg);
+  color: var(--mdv-hl-attr);
+}
+
+.hljs-deletion {
+  background: var(--mdv-hl-del-bg);
+  color: var(--mdv-hl-string);
+}
+
+.hljs-emphasis {
+  font-style: italic;
+}
+
+.hljs-strong {
+  font-weight: 600;
+}
+
+@media print {
+  .hljs-keyword, .hljs-string, .hljs-comment, .hljs-number, .hljs-literal,
+  .hljs-title, .hljs-attr, .hljs-variable, .hljs-meta, .hljs-tag {
+    color: #000000;
+  }
+
+  .hljs-keyword,
+  .hljs-title {
+    font-weight: 600;
+  }
+
+  .hljs-addition,
+  .hljs-deletion {
+    background: transparent;
+  }
+}
