@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Package
   xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
   xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
@@ -9,18 +9,17 @@
   IgnorableNamespaces="uap uap3 uap5 desktop rescap">
 
   <!--
-    Identity Name and Publisher are placeholders. When you associate the project with the
-    reserved app name in Partner Center (Project > Package and Publish > Associate App with the Store),
-    Visual Studio replaces Name, Publisher and PublisherDisplayName with the values from your account.
+    Identity and PublisherDisplayName come from Partner Center and must match the reserved app
+    exactly, or the Store rejects the upload. Keep the fourth part of Version at 0.
   -->
   <Identity
-    Name="MarkdownViewerSimple"
-    Publisher="CN=YourPublisher"
+    Name="AkilanRagavaswamy.MarkdownViewer-Simple"
+    Publisher="CN=4FEF7FAB-6AD4-4C46-88A8-05AFF705DD4C"
     Version="1.0.0.0" />
 
   <Properties>
     <DisplayName>Markdown Viewer - Simple</DisplayName>
-    <PublisherDisplayName>[Your publisher name]</PublisherDisplayName>
+    <PublisherDisplayName>Akilan Ragavaswamy</PublisherDisplayName>
     <Logo>Assets\StoreLogo.png</Logo>
   </Properties>
 
