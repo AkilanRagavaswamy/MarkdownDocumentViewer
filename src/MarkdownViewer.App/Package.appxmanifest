@@ -15,7 +15,7 @@
   <Identity
     Name="AkilanRagavaswamy.MarkdownViewer-Simple"
     Publisher="CN=4FEF7FAB-6AD4-4C46-88A8-05AFF705DD4C"
-    Version="1.0.0.0" />
+    Version="1.0.1.0" />
 
   <Properties>
     <DisplayName>Markdown Viewer - Simple</DisplayName>
