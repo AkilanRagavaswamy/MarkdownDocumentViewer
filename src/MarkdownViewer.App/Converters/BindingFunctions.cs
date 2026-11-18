@@ -28,6 +28,9 @@ public static class BindingFunctions
     /// <summary>True when both strings have content.</summary>
     public static bool HasTextAndContent(string? text, string? other) => !string.IsNullOrWhiteSpace(text) && !string.IsNullOrEmpty(other);
 
+    /// <summary>True when the string has content.</summary>
+    public static bool HasText(string? value) => !string.IsNullOrWhiteSpace(value);
+
     public static FontWeight HeadingWeight(bool isCurrent, int level) => isCurrent || level <= 1 ? Microsoft.UI.Text.FontWeights.SemiBold : Microsoft.UI.Text.FontWeights.Normal;
 
     public static bool IsComfortable(DensityPreset density) => density == DensityPreset.Comfortable;

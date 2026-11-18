@@ -77,12 +77,14 @@ public sealed class AppSettings
 /// <summary>One heading in the document outline.</summary>
 public sealed record OutlineNode(int Level, string Title, string AnchorId, IReadOnlyList<OutlineNode> Children);
 
-/// <summary>Result of parsing a Markdown file.</summary>
+/// <summary>Result of parsing a Markdown file. Notice is set when the document only rendered
+/// after falling back to a reduced pipeline, and is shown above the reading surface.</summary>
 public sealed record RenderResult(
     string BodyHtml,
     IReadOnlyList<OutlineNode> Outline,
     int WordCount,
-    IReadOnlyDictionary<string, string>? FrontMatter);
+    IReadOnlyDictionary<string, string>? FrontMatter,
+    string? Notice = null);
 
 /// <summary>Text read from disk plus detected encoding details.</summary>
 public sealed record LoadedText(string Text, string EncodingLabel, string LineEndingLabel);

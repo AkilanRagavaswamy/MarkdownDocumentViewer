@@ -139,14 +139,22 @@
                     Content="Try again" />
             </StackPanel>
 
-            <!-- Non-fatal errors (e.g. a link that could not be opened) while the document stays visible. -->
-            <InfoBar
-                Margin="12,12,12,0"
-                VerticalAlignment="Top"
-                IsClosable="True"
-                IsOpen="{x:Bind cv:BindingFunctions.HasTextAndContent(ViewModel.ErrorMessage, ViewModel.Html), Mode=OneWay}"
-                Message="{x:Bind ViewModel.ErrorMessage, Mode=OneWay}"
-                Severity="Warning" />
+            <!-- Top-of-document bars, stacked so a notice and an error never overlap. -->
+            <StackPanel Margin="12,12,12,0" VerticalAlignment="Top" Spacing="8">
+                <!-- The document parsed only after the malformed-table fallback; says what was done. -->
+                <InfoBar
+                    IsClosable="True"
+                    IsOpen="{x:Bind cv:BindingFunctions.HasText(ViewModel.Notice), Mode=OneWay}"
+                    Message="{x:Bind ViewModel.Notice, Mode=OneWay}"
+                    Severity="Informational" />
+
+                <!-- Non-fatal errors (e.g. a link that could not be opened) while the document stays visible. -->
+                <InfoBar
+                    IsClosable="True"
+                    IsOpen="{x:Bind cv:BindingFunctions.HasTextAndContent(ViewModel.ErrorMessage, ViewModel.Html), Mode=OneWay}"
+                    Message="{x:Bind ViewModel.ErrorMessage, Mode=OneWay}"
+                    Severity="Warning" />
+            </StackPanel>
 
             <!-- Find bar overlay -->
             <Border

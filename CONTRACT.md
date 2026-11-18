@@ -44,7 +44,7 @@ Commands (RelayCommand names → generated `XxxCommand`): `OpenFile`, `OpenFolde
 Methods: `Task OpenPathsAsync(IEnumerable<string> paths)` (activation / drag-drop / command line), `Task InitializeAsync()`.
 
 ### DocumentTabViewModel : ObservableRecipient
-`Guid Id`, `string FilePath`, `string Title`, `string Html`, `string SourceText`, `bool ShowSource`, `ObservableCollection<OutlineItemViewModel> Outline`, `string? CurrentHeadingId`, `string CurrentSectionTitle`, `int WordCount`, `string StatsText` ("612 words · 3 min read"), `string EncodingLabel`, `string LineEndingLabel`, `double ZoomFactor` (0.5–3.0), `bool IsFindOpen`, `string FindQuery`, `string FindStatus` ("2 of 14"), `bool IsLoading`, `string? ErrorMessage`, `bool CanGoBack`, `bool CanGoForward`, `string DocumentFolder`.
+`Guid Id`, `string FilePath`, `string Title`, `string Html`, `string SourceText`, `string? Notice` (set when the document only rendered under a reduced pipeline), `bool ShowSource`, `ObservableCollection<OutlineItemViewModel> Outline`, `string? CurrentHeadingId`, `string CurrentSectionTitle`, `int WordCount`, `string StatsText` ("612 words · 3 min read"), `string EncodingLabel`, `string LineEndingLabel`, `double ZoomFactor` (0.5–3.0), `bool IsFindOpen`, `string FindQuery`, `string FindStatus` ("2 of 14"), `bool IsLoading`, `string? ErrorMessage`, `bool CanGoBack`, `bool CanGoForward`, `string DocumentFolder`.
 Commands: `Reload`, `FindNext`, `FindPrevious`, `CloseFind`, `NavigateToHeading(OutlineItemViewModel)`, `GoBack`, `GoForward`.
 Methods called by view: `OnViewerReady()`, `OnHeadingChanged(string anchorId)`, `OnFindResult(int current, int total)`, `OnLinkActivated(string href)`, `Task LoadAsync(string path)`.
 

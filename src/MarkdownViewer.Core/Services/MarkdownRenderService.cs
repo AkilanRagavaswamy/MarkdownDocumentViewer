@@ -5,6 +5,7 @@ using AngleSharp.Dom;
 using Ganss.Xss;
 using Markdig;
 using Markdig.Extensions.AutoIdentifiers;
+using Markdig.Extensions.Tables;
 using Markdig.Extensions.Yaml;
 using Markdig.Renderers;
 using Markdig.Renderers.Html;
@@ -24,25 +25,114 @@ public sealed partial class MarkdownRenderService : IMarkdownRenderService
     public const int MaxOutlineLevel = 4;
 
     private readonly MarkdownPipeline _pipeline;
+    private readonly MarkdownPipeline _withoutPipeTables;
     private readonly HtmlSanitizer _sanitizer;
 
     /// <summary>Creates the service with the shared Markdig pipeline and sanitizer configuration.</summary>
     public MarkdownRenderService()
     {
         _pipeline = CreatePipeline();
+        _withoutPipeTables = CreatePipelineWithoutPipeTables();
         _sanitizer = CreateSanitizer();
     }
+
+    /// <summary>
+    /// Shown when blank lines between a |---| row and the rows beneath it had to be removed. Those
+    /// blank lines end the block, so the rows are not a table in any renderer — just a paragraph of
+    /// pipe characters, and a wide one also trips Markdig's 128-delimiter nesting cap.
+    /// </summary>
+    internal const string RepairedTableNotice =
+        "This document has blank lines between table |---| rows and the rows beneath them, which breaks "
+        + "those tables. They are shown here as tables anyway; delete the blank lines to fix the file.";
+
+    /// <summary>Shown when even the repair was not enough and pipe tables had to be switched off.</summary>
+    internal const string MalformedTableNotice =
+        "Part of this document nests too deeply for the Markdown parser, so tables are shown as plain text.";
 
     /// <inheritdoc />
     public RenderResult Render(string markdown)
     {
         markdown ??= string.Empty;
 
-        var document = Markdown.Parse(markdown, _pipeline);
+        try
+        {
+            return Render(markdown, _pipeline, notice: null);
+        }
+        catch (ArgumentException)
+        {
+            // Markdig caps inline nesting at 128 delimiters per paragraph. Nothing legitimate reaches
+            // that, but an orphaned table body does, so try the document again with the orphans
+            // re-attached, and only if that still fails give up the tables to keep the document.
+            var repaired = RepairOrphanedTableRows(markdown);
+            if (!ReferenceEquals(repaired, markdown))
+            {
+                try
+                {
+                    return Render(repaired, _pipeline, RepairedTableNotice);
+                }
+                catch (ArgumentException)
+                {
+                    // Fall through: something else in the document is too deeply nested.
+                }
+            }
+
+            // If this throws too, the caller sees the original failure.
+            return Render(markdown, _withoutPipeTables, MalformedTableNotice);
+        }
+    }
+
+    /// <summary>
+    /// Removes blank lines sitting between a table delimiter row and the rows that follow it. A
+    /// delimiter row only ever belongs to a table, so rows separated from one by nothing but blank
+    /// lines were meant to be its body. Returns the original string when there is nothing to repair.
+    /// </summary>
+    internal static string RepairOrphanedTableRows(string markdown)
+    {
+        if (string.IsNullOrEmpty(markdown) || !markdown.Contains('|'))
+        {
+            return markdown;
+        }
+
+        var lines = markdown.Split('\n');
+        var kept = new List<string>(lines.Length);
+        var repaired = false;
+
+        for (var i = 0; i < lines.Length; i++)
+        {
+            kept.Add(lines[i]);
+            if (!TableDelimiterRow().IsMatch(lines[i].TrimEnd('\r')))
+            {
+                continue;
+            }
+
+            // Look past the blank lines: only drop them when table rows actually follow.
+            var next = i + 1;
+            while (next < lines.Length && lines[next].Trim().Length == 0)
+            {
+                next++;
+            }
+
+            if (next > i + 1 && next < lines.Length && lines[next].TrimStart().StartsWith('|'))
+            {
+                i = next - 1;
+                repaired = true;
+            }
+        }
+
+        return repaired ? string.Join("\n", kept) : markdown;
+    }
+
+    /// <summary>Matches a GFM table delimiter row, e.g. <c>|---|:--:|</c>.</summary>
+    [GeneratedRegex(@"^\s*\|(?:\s*:?-+:?\s*\|)+\s*$")]
+    private static partial Regex TableDelimiterRow();
+
+    private RenderResult Render(string markdown, MarkdownPipeline pipeline, string? notice)
+    {
+        var document = Markdown.Parse(markdown, pipeline);
 
         using var writer = new StringWriter();
         var renderer = new HtmlRenderer(writer);
-        _pipeline.Setup(renderer);
+        pipeline.Setup(renderer);
         renderer.Render(document);
         writer.Flush();
 
@@ -57,19 +147,28 @@ public sealed partial class MarkdownRenderService : IMarkdownRenderService
         var outline = BuildOutline(document);
         var words = CountWords(safeHtml);
 
-        return new RenderResult(safeHtml, outline, words, frontMatter);
+        return new RenderResult(safeHtml, outline, words, frontMatter, notice);
     }
 
     /// <summary>Builds the Markdig pipeline. Auto identifiers are registered first so the GitHub style wins.</summary>
-    internal static MarkdownPipeline CreatePipeline() =>
+    internal static MarkdownPipeline CreatePipeline() => PipelineBuilder().Build();
+
+    /// <summary>The same pipeline without pipe tables, for documents the full one cannot parse.</summary>
+    internal static MarkdownPipeline CreatePipelineWithoutPipeTables()
+    {
+        var builder = PipelineBuilder();
+        builder.Extensions.RemoveAll(extension => extension is PipeTableExtension);
+        return builder.Build();
+    }
+
+    private static MarkdownPipelineBuilder PipelineBuilder() =>
         new MarkdownPipelineBuilder()
             // Must precede UseAdvancedExtensions: extensions are added only if not already present.
             .UseAutoIdentifiers(AutoIdentifierOptions.GitHub)
             .UseAdvancedExtensions()
             .UseAlertBlocks()
             .UseYamlFrontMatter()
-            .UseEmojiAndSmiley()
-            .Build();
+            .UseEmojiAndSmiley();
 
     /// <summary>Creates an allow-list sanitizer suited to Markdig output.</summary>
     internal static HtmlSanitizer CreateSanitizer()

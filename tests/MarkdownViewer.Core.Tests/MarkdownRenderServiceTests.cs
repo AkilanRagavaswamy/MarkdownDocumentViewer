@@ -179,6 +179,55 @@ public class MarkdownRenderServiceTests
         Assert.Equal(5, result.WordCount);
     }
 
+    [Fact]
+    public void OrphanedTableBody_IsReattached_AndRendersAsATable()
+    {
+        // A blank line after the |---| row ends the block, so the rows below are one paragraph of
+        // pipes. Past 128 pipe characters Markdig throws, which used to make the file unopenable.
+        var rows = string.Join("\n", Enumerable.Repeat("| a | b | c | d | e | f | g |", 20));
+        var md = "# Title\n\n| a | b | c | d | e | f | g |\n|---|---|---|---|---|---|---|\n\n" + rows + "\n";
+
+        var result = _service.Render(md);
+
+        Assert.Equal(MarkdownRenderService.RepairedTableNotice, result.Notice);
+        Assert.Contains("<table", result.BodyHtml);
+        Assert.Single(result.Outline);
+    }
+
+    [Fact]
+    public void WellFormedTable_RendersAsATable_WithNoNotice()
+    {
+        var rows = string.Join("\n", Enumerable.Repeat("| a | b | c | d | e | f | g |", 60));
+        var md = "| a | b | c | d | e | f | g |\n|---|---|---|---|---|---|---|\n" + rows + "\n";
+
+        var result = _service.Render(md);
+
+        Assert.Null(result.Notice);
+        Assert.Contains("<table", result.BodyHtml);
+    }
+
+    [Fact]
+    public void DeeplyNestedParagraph_WithNoTableToRepair_StillRenders()
+    {
+        // Pipes with no delimiter row anywhere: nothing to re-attach, so tables are given up instead.
+        var md = "# Title\n\n" + string.Join("\n", Enumerable.Repeat("| a | b | c | d | e | f | g |", 40)) + "\n";
+
+        var result = _service.Render(md);
+
+        Assert.Equal(MarkdownRenderService.MalformedTableNotice, result.Notice);
+        Assert.DoesNotContain("<table", result.BodyHtml);
+        Assert.Single(result.Outline);
+    }
+
+    [Fact]
+    public void RepairOrphanedTableRows_LeavesSoundMarkdownAlone()
+    {
+        const string md = "| a | b |\n|---|---|\n| 1 | 2 |\n\nA paragraph | with a pipe in it.\n";
+
+        Assert.Same(md, MarkdownRenderService.RepairOrphanedTableRows(md));
+    }
+
+
     private static IEnumerable<Contracts.OutlineNode> Flatten(IEnumerable<Contracts.OutlineNode> nodes) =>
         nodes.SelectMany(n => new[] { n }.Concat(Flatten(n.Children)));
 }

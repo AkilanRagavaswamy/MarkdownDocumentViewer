@@ -48,6 +48,10 @@ public sealed partial class DocumentTabViewModel : ObservableRecipient, IDisposa
     [ObservableProperty]
     private string _sourceText = string.Empty;
 
+    /// <summary>Set when the document only rendered under a reduced pipeline; shown above the reading surface.</summary>
+    [ObservableProperty]
+    private string? _notice;
+
     [ObservableProperty]
     private bool _showSource;
 
@@ -249,6 +253,7 @@ public sealed partial class DocumentTabViewModel : ObservableRecipient, IDisposa
         EncodingLabel = loaded.EncodingLabel;
         LineEndingLabel = loaded.LineEndingLabel;
         WordCount = result.WordCount;
+        Notice = result.Notice;
         RebuildOutline(result.Outline);
         RebuildHtml();
     }
@@ -260,6 +265,7 @@ public sealed partial class DocumentTabViewModel : ObservableRecipient, IDisposa
         EncodingLabel = string.Empty;
         LineEndingLabel = string.Empty;
         WordCount = 0;
+        Notice = null;
         Outline.Clear();
         Html = string.Empty;
     }
